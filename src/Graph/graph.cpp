@@ -120,7 +120,27 @@ std::vector<direction_t> gen_next_path(node* src, direction_t dir, node* dest)
         }
     }
 
-    return path;
+    std::vector<direction_t> path_optimized;
+    int count = 0;
+    for(auto v : path)
+    {
+        if(v == right)
+        {
+            count++;
+        }
+        else
+        {
+            if(count == 3) path_optimized.push_back(left);
+            else for(int i = 0; i < count; i++) path_optimized.push_back(right);
+            count = 0; 
+            path_optimized.push_back(v);
+        }
+    }    
+
+    if(count == 3) path_optimized.push_back(left);
+    else for(int i = 0; i < count; i++) path_optimized.push_back(right);
+
+    return path_optimized;
 }
 
 std::string gen_graph_string(node* src)
