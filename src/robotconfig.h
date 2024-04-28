@@ -9,7 +9,9 @@
  * - kinematic configuration
  * - battery
  ******************************************************************************/
-const float wheel_dist = 0.200; //wheel distance
+const float wheel_dist = 0.105; //wheel distance (10.5cm)
+const float wheel_radius_right = 0.065/2; // 3.25cm
+const float wheel_radius_left = 0.065/2; // 3.25cm
 const float kRobotBattVnom = 7.4;    //!< nominal battery level (V)
 
 /******************************************************************************

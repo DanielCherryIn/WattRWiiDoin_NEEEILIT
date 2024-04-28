@@ -81,6 +81,38 @@ void Robot::stop(void) {
   }
 }
 
+void Robot::odometry(void)
+{
+  float v1e = mot[0].vel * wheel_radius_right;                 //change to separate wheel radiuses for left and right
+  float v2e = mot[1].vel * wheel_radius_left;     
+
+  // Estimate robot speed
+  ve = (v1e + v2e) / 2.0;
+  we = (v1e - v2e) / wheel_dist;
+  
+  // Estimate the distance and the turn angle
+  float ds = ve * dt;
+  float dtheta = we * dt;
+
+  // Estimate pose
+  xe += ds * cos(thetae + dtheta/2);
+  ye += ds * sin(thetae + dtheta/2);
+  thetae = thetae + dtheta;
+
+  // Relative displacement
+  rel_s += ds;
+  rel_theta += dtheta;
+}
+
+void Robot::setRobotVW(float v, float w)
+{
+  float v1ref = v + w * wheel_dist / 2;
+  float v2ref = v - w * wheel_dist / 2; 
+  
+  pid[0].w_ref = v1ref * wheel_radius_right;
+  pid[1].w_ref = v2ref * wheel_radius_left;
+}
+
 void Robot::setMotorWref(uint8_t index, float new_w_r) {
   pid[index].w_ref = new_w_r;
 }
