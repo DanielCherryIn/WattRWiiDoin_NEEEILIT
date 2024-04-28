@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <Robot.h>
-
+#include <HC_SR04.h>
 
 volatile int count_R = 0;// count for right motor encoder
 volatile int count_L = 0;// count for left motor encoder
@@ -14,7 +14,6 @@ unsigned long LOOP_TIME = 40;
 Robot robot;
 
 //============ ULTRASONIC sensor =============//
-#include <HC_SR04.h>
 
 #define ULTRASONIC_TRIG_1 0
 #define ULTRASONIC_ECHO_1 1
@@ -110,8 +109,9 @@ void setup() {
   Serial.println("Server started");
 
   //loop vars
-  sensor_interval = 10;
-  last_cycle = 0;
+  /* sensor_interval = 10;
+  last_cycle = 0; */
+  now=millis();
 }
 
 
@@ -132,7 +132,7 @@ void loop() {
     Serial.println(vel_L);
     robot.setMotorPWM(0,100);
     robot.setMotorPWM(1,100);
-  }
+  
 
     //Read distance sensors if ready
     if(sensor1.isFinished()){
@@ -154,27 +154,28 @@ void loop() {
     Serial.print(dist2);
     Serial.print("; Sensor 3: ");
     Serial.println(dist3);
-  }
+  
 
-  // Check for incoming client connections
-  WiFiClient client = server.available();
-  if (client) {
-      //Serial.println("Client connected");
-      while (client.connected()) {
-          // Receive data from the client while he is available
-          if (client.available()) {
-              // Read the data from the client until an ending character is found
-              String request = client.readStringUntil('\0');
-              Serial.print("Received: ");
-              Serial.print("[PC] "); 
-              Serial.println(request);
-              // Send a response to the client
-              String response = "ACK - \"" + request + "\"";
-              Serial.print("[RASP] ");
-              client.print(response);
-              // Sends possible remaining data to the client, cleaning the buffer
-              client.flush(); 
-          }
-      }
+    // Check for incoming client connections
+    WiFiClient client = server.available();
+    if (client) {
+        //Serial.println("Client connected");
+        while (client.connected()) {
+            // Receive data from the client while he is available
+            if (client.available()) {
+                // Read the data from the client until an ending character is found
+                String request = client.readStringUntil('\0');
+                Serial.print("Received: ");
+                Serial.print("[PC] "); 
+                Serial.println(request);
+                // Send a response to the client
+                String response = "ACK - \"" + request + "\"";
+                Serial.print("[RASP] ");
+                client.print(response);
+                // Sends possible remaining data to the client, cleaning the buffer
+                client.flush(); 
+            }
+        }
+    }
   }
 }
