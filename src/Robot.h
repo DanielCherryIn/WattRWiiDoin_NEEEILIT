@@ -21,6 +21,10 @@ class Robot {
   Motor mot[2];
   CtrlPID pid[2];
 
+  int sonic_dist[3]; //stores distance from each sensor (0->right, 1->left, 2->front)
+  int wall_dist = 5;   //distance to be from wall when only one side (cm)
+  int wall_thresh = 10; //distance to consider there is a wall on that side (if over thresh, will only follow one side) 
+
   float ve;   //estimated robot linear speed
   float we;   //estimated robot angular speed
   float xe, ye, thetae; //relative positioning (x, y, angle)
@@ -40,6 +44,8 @@ class Robot {
 
   void odometry(void);    //calculates robot linear and angular speed, positioning and movement
   void setRobotVW(float v, float w);  //sets motors Wref based on intended robot linear and angular speed 
+
+  void followWall(float v, float k);  // goes in a straight line at speed v while aligning with wall(s)
 
  private:
   void initEnc();

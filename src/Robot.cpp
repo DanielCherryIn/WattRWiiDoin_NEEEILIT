@@ -121,6 +121,26 @@ void Robot::setMotorPWM(uint8_t index, int16_t pwm) {
   mot[index].setPWM(pwm);
 }
 
+void Robot::followWall(float v, float k) {
+  float w_req;
+  float v_req = v;
+  //if walls are detected on both sides, tries to make the distances equal
+  if (sonic_dist[0] < wall_thresh && sonic_dist[1] < wall_thresh) {
+    w_req = k * (sonic_dist[0] - sonic_dist[1]);
+  }
+  //if wall is only on right keep fixed distance
+  else if (sonic_dist[0] < wall_thresh) {
+    w_req = -k * (sonic_dist[0] - wall_dist);
+  }
+  //if wall is only on left keep fixed distance
+  else if (sonic_dist[1] < wall_thresh) {
+    w_req = k * (sonic_dist[1] - wall_dist);
+  }
+  //if no walls are detected, let jesus take the wheel
+  else
+    w_req = 0;
+}
+
 void Robot::initEnc() {
   pinMode(kMotEncPin0A, INPUT_PULLUP);
   pinMode(kMotEncPin0B, INPUT_PULLUP);

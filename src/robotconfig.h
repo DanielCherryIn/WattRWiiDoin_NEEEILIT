@@ -25,6 +25,12 @@ const int Motor2_IN3 = 26;
 const int Motor2_IN4 = 28;
 const int E_Motor1 = 15;
 const int E_Motor2 = 14;
+const int Ultrasonic_TRIG1 = 0;
+const int Ultrasonic_TRIG2 = 1;
+const int Ultrasonic_TRIG3 = 2;
+const int Ultrasonic_ECHO1 = 3;
+const int Ultrasonic_ECHO2 = 4;
+const int Ultrasonic_ECHO3 = 5;
 
 /******************************************************************************
  * Motor parameters
