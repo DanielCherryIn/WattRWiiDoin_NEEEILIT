@@ -25,12 +25,12 @@ const int Motor2_IN3 = 26;
 const int Motor2_IN4 = 28;
 const int E_Motor1 = 15;
 const int E_Motor2 = 14;
-const int Ultrasonic_TRIG1 = 0;
-const int Ultrasonic_TRIG2 = 1;
-const int Ultrasonic_TRIG3 = 2;
-const int Ultrasonic_ECHO1 = 3;
-const int Ultrasonic_ECHO2 = 4;
-const int Ultrasonic_ECHO3 = 5;
+const int Ultrasonic_TRIG1 = 4;
+const int Ultrasonic_ECHO1 = 5;
+const int Ultrasonic_TRIG2 = 2;
+const int Ultrasonic_ECHO2 = 3;
+const int Ultrasonic_TRIG3 = 7;
+const int Ultrasonic_ECHO3 = 8;
 
 /******************************************************************************
  * Motor parameters
@@ -67,7 +67,7 @@ const unsigned long kMotCtrlLEDOkCount =
 const float kMotVmax = 7.4;          //!< maximum voltage appliable to motors (V)
 const int16_t kMotPWMmax = 255;     //!< maximum PWM (0..1023)
 const int16_t kMotPWMDeltaMax = 100;//!< maximum variation in PWM (0..1023)
-const float pwm_offset = 130;
+const float pwm_offset = 140;
 const float pulse2rad = 2*PI/19099.0249/0.01; // pulse count to rad/s constant
 const bool kMotPWMDeltaMaxEnabled = true; //!< enable limits on PWM variation
 

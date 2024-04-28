@@ -33,7 +33,9 @@ void build(node* src, direction_t dir, bool neighbours[4]);
 
 node* explore(); //returns destination node
 
-std::vector<direction_t> gen_next_path(node* src, direction_t dir, node* dest);
+direction_t* gen_next_path(node* src, direction_t dir, node* dest, int*);
 std::string gen_graph_string(node* src);
+
+node* get_new_node();
 
 #endif

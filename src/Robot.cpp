@@ -49,10 +49,17 @@ void Robot::init() {
   mot[0].init(Motor1_IN1, Motor1_IN2, E_Motor1);
   mot[1].init(Motor2_IN3, Motor2_IN4, E_Motor2);
 
+
+  sum_error = 0;
+
+  dir = front;
+  cur = get_new_node();
+  cur->id = 0;
+  stack.push_back(cur);
   // Controllers
-  for (i = 0; i < 2; i++) {
-    initCtrlPID(i);
-  }
+  //for (i = 0; i < 2; i++) {
+    //initCtrlPID(i);
+  //}
 }
 
 void Robot::update(uint32_t &delta) {
@@ -80,6 +87,8 @@ void Robot::update(uint32_t &delta) {
   // Relative displacement
   rel_s += ds;
   rel_theta += dtheta;
+
+  
 }
 
 void Robot::stop(void) {
@@ -90,6 +99,15 @@ void Robot::stop(void) {
   }
 }
 
+void Robot::spin_left(int speed){
+    setMotorPWM(0,speed);
+    setMotorPWM(1,-speed);
+}
+
+void Robot::spin_right(int speed){
+    setMotorPWM(0,-speed);
+    setMotorPWM(1,speed);
+}
 /* void Robot::odometry(void)
 {
   float v1e = mot[0].vel * wheel_radius_right;                 //change to separate wheel radiuses for left and right
@@ -117,13 +135,15 @@ void Robot::setRobotVW(float v, float w)
 {
   float v1ref = v + w * wheel_dist / 2;
   float v2ref = v - w * wheel_dist / 2; 
+
+  v1ref = v1ref * 1.05;
+  v2ref = v2ref * 0.9;
   
-  if(ve==0){
-    setMotorPWM(0,150+v1ref*1.07);
+  if(ve<1){
+    setMotorPWM(0,180+v1ref);
     setMotorPWM(1,150+v2ref);
   }else{
-
-    setMotorPWM(0,v1ref*1.07);
+    setMotorPWM(0,v1ref);
     setMotorPWM(1,v2ref);
   }
   
@@ -137,24 +157,50 @@ void Robot::setMotorPWM(uint8_t index, int16_t pwm) {
   mot[index].setPWM(pwm);
 }
 
-void Robot::followWall(float v, float k) {
+void Robot::followWall(float v, float k, float ki, float deltaT) {
   float w_req;
   float v_req = v;
+  static int last = 0;
+  float error;
+
   //if walls are detected on both sides, tries to make the distances equal
-  if (sonic_dist[0] < wall_thresh && sonic_dist[1] < wall_thresh) {
-    w_req = k * (sonic_dist[0] - sonic_dist[1]);
+  if (wall_R && wall_L) {
+    error = (sonic_dist[0] - sonic_dist[1]);
+    if(last !=0 )
+      sum_error = 0;
+    last = 0;
   }
   //if wall is only on right keep fixed distance
-  else if (sonic_dist[0] < wall_thresh) {
-    w_req = -k * (sonic_dist[0] - wall_dist);
+  else if (wall_R) {
+    error = (sonic_dist[0] - (wall_dist+1));
+    if(error<0)
+      error=error*1.5;
+    if(last !=1 )
+      sum_error = 0;
+    last = 1;
   }
   //if wall is only on left keep fixed distance
-  else if (sonic_dist[1] < wall_thresh) {
-    w_req = k * (sonic_dist[1] - wall_dist);
+  else if (wall_L) {
+    error = -(sonic_dist[1] - wall_dist);
+    if(error>0)
+      error=error*2;
+    if(last !=2 )
+      sum_error = 0;
+    last = 2;
   }
   //if no walls are detected, let jesus take the wheel
-  else
-    w_req = 0;
+  else{
+    error = 0;
+    sum_error = 0;
+    last=3;
+  }
+  
+  sum_error = sum_error + error * deltaT;
+
+  w_req = -k * error + ki * sum_error;
+  
+  
+  setRobotVW(v_req, w_req);
 }
 
 void Robot::initEnc() {
@@ -164,7 +210,8 @@ void Robot::initEnc() {
   pinMode(kMotEncPin1B, INPUT_PULLUP);
 }
 
-/* void Robot::initCtrlPID(uint8_t index) {
+/*
+ void Robot::initCtrlPID(uint8_t index) {
 
   pid[index].kp = kMotCtrlKc;
   if (kMotCtrlTi == 0) {
