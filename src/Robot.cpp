@@ -18,10 +18,20 @@ void int_enc_Lmot(){
 
 bool updateEncodersState(struct repeating_timer *t){
   (void) t;
-  vel_R=(count_R*pulse2rad);//calculations to get rad/s from pulse count
-  vel_L=(count_L*pulse2rad);
-  count_L=0;
-  count_R=0;
+  static bool running = true;
+  if(!running){
+    count_L=0;
+    count_R=0;
+    attachInterrupt(digitalPinToInterrupt(kMotEncPin1A), int_enc_Lmot, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(kMotEncPin0A), int_enc_Rmot, CHANGE);
+    running = true;
+  }else{
+    vel_R=(count_R*pulse2rad);//calculations to get rad/s from pulse count
+    vel_L=(count_L*pulse2rad);
+    detachInterrupt(digitalPinToInterrupt(kMotEncPin1A));
+    detachInterrupt(digitalPinToInterrupt(kMotEncPin0A));
+    running = false;
+  }
   return true;
 }
 

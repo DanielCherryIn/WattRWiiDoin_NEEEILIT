@@ -7,11 +7,13 @@ volatile int count_L = 0;// count for left motor encoder
 volatile float vel_R = 0;
 volatile float vel_L = 0;
 
-unsigned long now;
+unsigned long now, now1;
 
-unsigned long LOOP_TIME = 40;
+unsigned long LOOP_TIME = 37;
 
 Robot robot;
+
+volatile bool connected = false;
 
 //============ ULTRASONIC sensor =============//
 
@@ -37,6 +39,7 @@ int dist1, dist2, dist3;
 #define PASSWORD "arewedoing"     
 #define PORT 33000              // The port can be any number if high enough
 WiFiServer server(PORT);        // Create a server object that listens on the specified port
+WiFiClient client;
 //===========================================//
 
 // loop vars
@@ -79,11 +82,74 @@ void echo_isr3(){
   }   
 }
 
+void setup1(){
+  //Serial.begin(115200);
+  // Set Rasp as an Access Point
+  WiFi.mode(WIFI_AP);
+  WiFi.softAP(SSID, PASSWORD);
+  Serial.println("Hi");
+  // Start the server
+  delay(2000);
+  
+  Serial.println("Hi");
+  server.begin();
+  Serial.println("Hi");
+  Serial.println("Server started");
+  now1=millis();
+  while(!client)
+    client = server.available();
+  connected = true;
+}
+
+void loop1(){
+  // Check for incoming client connections
+  if(!client.connected())
+    client = server.available();
+  if(!client)
+    client = server.available();
+  if((millis()-now1)>LOOP_TIME){
+    now1=millis();
+    
+    if (client) {
+        Serial.println("Client connected");
+        while(client.connected()) {
+            if((millis()-now1)>LOOP_TIME){
+              now1=millis();
+              // Receive data from the client while he is available
+              if (client.available()) {
+                  // Read the data from the client until an ending character is found
+                  String request = client.readStringUntil('\0');
+                  Serial.print("Received: ");
+                  Serial.print("[PC] "); 
+                  Serial.println(request);
+                  // Send a response to the client
+                  String response = "ACK - \"" + request + "\"";
+                  Serial.print("[RASP] ");
+                  client.print(response); 
+                  // Sends possible remaining data to the client, cleaning the buffer
+                  Serial.println("Hi");
+                  client.print(vel_L);
+                  client.print(vel_R);
+                  client.print("\0");
+                  client.flush();
+              } 
+          }
+        }
+
+    }
+  }
+}
+
 
 void setup() {
   // put your setup code here, to run once:
   // Setup serial coms
+  //set_sys_clock_khz(250000, true);
   Serial.begin(115200);
+  //while(!Serial);
+
+
+  robot.init();
 
   pinMode(LED_BUILTIN, OUTPUT);
 
@@ -99,26 +165,19 @@ void setup() {
   sensor2.start();
   sensor3.start();
 
-  // Set Rasp as an Access Point
-  WiFi.mode(WIFI_AP);
-  WiFi.softAP(SSID, PASSWORD);
-
-  // Start the server
-  delay(2000);
-  server.begin();
-  Serial.println("Server started");
-
   //loop vars
   /* sensor_interval = 10;
   last_cycle = 0; */
+  //while(!connected);
+  
   now=millis();
 }
 
 
 void loop() {
   // put your main code here, to run repeatedly:
-  /*digitalWrite(LED_BUILTIN, HIGH);
-  uint32_t now = millis();
+  digitalWrite(LED_BUILTIN, HIGH);
+  /*uint32_t now = millis();
   uint32_t delta = now - last_cycle;
 
   if (delta >= sensor_interval) {
@@ -127,9 +186,12 @@ void loop() {
     Serial.println(millis());
 
   delay(1000);*/
+  //Serial.println(millis()-now);
   if((millis()-now)>LOOP_TIME){
     now=millis();
-    Serial.println(vel_L);
+    Serial.print(count_L);
+    Serial.print(" ");
+    Serial.println(count_R);
     robot.setMotorPWM(0,100);
     robot.setMotorPWM(1,100);
   
@@ -148,34 +210,12 @@ void loop() {
       sensor3.start();
     }
 
-    Serial.print("Sensor 1: ");
+    /* Serial.print("Sensor 1: ");
     Serial.print(dist1);
     Serial.print("; Sensor 2: ");
     Serial.print(dist2);
     Serial.print("; Sensor 3: ");
-    Serial.println(dist3);
-  
+    Serial.println(dist3); */
 
-    // Check for incoming client connections
-    WiFiClient client = server.available();
-    if (client) {
-        //Serial.println("Client connected");
-        while (client.connected()) {
-            // Receive data from the client while he is available
-            if (client.available()) {
-                // Read the data from the client until an ending character is found
-                String request = client.readStringUntil('\0');
-                Serial.print("Received: ");
-                Serial.print("[PC] "); 
-                Serial.println(request);
-                // Send a response to the client
-                String response = "ACK - \"" + request + "\"";
-                Serial.print("[RASP] ");
-                client.print(response);
-                // Sends possible remaining data to the client, cleaning the buffer
-                client.flush(); 
-            }
-        }
-    }
   }
 }

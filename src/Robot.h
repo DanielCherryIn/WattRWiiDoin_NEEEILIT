@@ -17,7 +17,7 @@ extern volatile float vel_L;
 class Robot {
  public:
   uint32_t dt;
-  float vel[2];//0->right//1->left
+  volatile float vel[2];//0->right//1->left
   Motor mot[2];
   CtrlPID pid[2];
 
