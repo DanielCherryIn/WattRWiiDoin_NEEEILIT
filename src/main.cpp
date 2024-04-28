@@ -16,20 +16,9 @@ Robot robot;
 volatile bool connected = false;
 
 //============ ULTRASONIC sensor =============//
-
-#define ULTRASONIC_TRIG_1 0
-#define ULTRASONIC_ECHO_1 1
-
-#define ULTRASONIC_TRIG_2 2
-#define ULTRASONIC_ECHO_2 3
-
-#define ULTRASONIC_TRIG_3 4
-#define ULTRASONIC_ECHO_3 5
-
-HC_SR04 sensor1(ULTRASONIC_TRIG_1, ULTRASONIC_ECHO_1, digitalPinToInterrupt(ULTRASONIC_ECHO_1));
-HC_SR04 sensor2(ULTRASONIC_TRIG_2, ULTRASONIC_ECHO_2, digitalPinToInterrupt(ULTRASONIC_ECHO_2));
-HC_SR04 sensor3(ULTRASONIC_TRIG_3, ULTRASONIC_ECHO_3, digitalPinToInterrupt(ULTRASONIC_ECHO_3));
-int dist1, dist2, dist3;
+HC_SR04 sensor1(Ultrasonic_TRIG1, Ultrasonic_ECHO1, digitalPinToInterrupt(Ultrasonic_ECHO1));
+HC_SR04 sensor2(Ultrasonic_TRIG2, Ultrasonic_ECHO2, digitalPinToInterrupt(Ultrasonic_ECHO2));
+HC_SR04 sensor3(Ultrasonic_TRIG3, Ultrasonic_ECHO3, digitalPinToInterrupt(Ultrasonic_ECHO3));
 //===========================================//
 
 //================= WIFI ====================//
@@ -209,15 +198,15 @@ void loop() {
     robot.setMotorWref(1,10);
     //Read distance sensors if ready
     if(sensor1.isFinished()){
-      dist1 = sensor1.getRange();
+      robot.sonic_dist[0] = sensor1.getRange();
       sensor1.start();
     }
     if(sensor2.isFinished()){
-      dist2 = sensor2.getRange();
+      robot.sonic_dist[1] = sensor2.getRange();
       sensor2.start();
     }
     if(sensor3.isFinished()){
-      dist3 = sensor3.getRange();
+      robot.sonic_dist[2] = sensor3.getRange();
       sensor3.start();
     }
 

@@ -82,12 +82,64 @@ void Robot::stop(void) {
   }
 }
 
+void Robot::odometry(void)
+{
+  float v1e = mot[0].vel * wheel_radius_right;                 //change to separate wheel radiuses for left and right
+  float v2e = mot[1].vel * wheel_radius_left;     
+
+  // Estimate robot speed
+  ve = (v1e + v2e) / 2.0;
+  we = (v1e - v2e) / wheel_dist;
+  
+  // Estimate the distance and the turn angle
+  float ds = ve * dt;
+  float dtheta = we * dt;
+
+  // Estimate pose
+  xe += ds * cos(thetae + dtheta/2);
+  ye += ds * sin(thetae + dtheta/2);
+  thetae = thetae + dtheta;
+
+  // Relative displacement
+  rel_s += ds;
+  rel_theta += dtheta;
+}
+
+void Robot::setRobotVW(float v, float w)
+{
+  float v1ref = v + w * wheel_dist / 2;
+  float v2ref = v - w * wheel_dist / 2; 
+  
+  pid[0].w_ref = v1ref * wheel_radius_right;
+  pid[1].w_ref = v2ref * wheel_radius_left;
+}
+
 void Robot::setMotorWref(uint8_t index, float new_w_r) {
   pid[index].w_ref = new_w_r;
 }
 
 void Robot::setMotorPWM(uint8_t index, int16_t pwm) {
   mot[index].setPWM(pwm);
+}
+
+void Robot::followWall(float v, float k) {
+  float w_req;
+  float v_req = v;
+  //if walls are detected on both sides, tries to make the distances equal
+  if (sonic_dist[0] < wall_thresh && sonic_dist[1] < wall_thresh) {
+    w_req = k * (sonic_dist[0] - sonic_dist[1]);
+  }
+  //if wall is only on right keep fixed distance
+  else if (sonic_dist[0] < wall_thresh) {
+    w_req = -k * (sonic_dist[0] - wall_dist);
+  }
+  //if wall is only on left keep fixed distance
+  else if (sonic_dist[1] < wall_thresh) {
+    w_req = k * (sonic_dist[1] - wall_dist);
+  }
+  //if no walls are detected, let jesus take the wheel
+  else
+    w_req = 0;
 }
 
 void Robot::initEnc() {
