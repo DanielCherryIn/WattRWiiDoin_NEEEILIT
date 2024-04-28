@@ -38,9 +38,9 @@ const uint8_t kMotEncPin1A = 12;  //!< encoder channel A of left wheel
 const uint8_t kMotEncPin1B = 13;  //!< encoder channel B of left wheel
 
 
-const float kMotModelKp  = 4.5000;    //!< gain (rad.s^(-1) / V)
-const float kMotModelTau = 0.1000;    //!< time constant (s)
-const float kMotModelLag = 0.0000;    //!< lag lag (s)
+const float kMotModelKp  = 5.0200;    //!< gain (rad.s^(-1) / V)
+const float kMotModelTau = 0.20;    //!< time constant (s)
+const float kMotModelLag = 0.6000;    //!< lag lag (s)
 
 // PWM constants
 
@@ -60,7 +60,7 @@ const float kMotVmax = 7.4;          //!< maximum voltage appliable to motors (V
 const int16_t kMotPWMmax = 255;     //!< maximum PWM (0..1023)
 const int16_t kMotPWMDeltaMax = 100;//!< maximum variation in PWM (0..1023)
 const float pwm_offset = 50;
-const float pulse2rad = 2*PI/19099.0249/0.02; // pulse count to rad/s constant
+const float pulse2rad = 2*PI/19099.0249/0.01; // pulse count to rad/s constant
 const bool kMotPWMDeltaMaxEnabled = true; //!< enable limits on PWM variation
 
 const float kMotHammV0 = 0.20;         //!< estimated motors' deadzone (V)

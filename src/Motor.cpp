@@ -37,5 +37,5 @@ void Motor::setPWM(int16_t new_vel) {
     digitalWrite(IN2, HIGH);
   }
 
-  analogWrite(EN, pwm);
+  analogWrite(EN, abs(pwm));
 }
