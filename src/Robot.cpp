@@ -61,29 +61,6 @@ void Robot::update(uint32_t &delta) {
 
   updateEncodersState();
 
-  /* vel[0]=abs(vel_R)*kMotV2MotPWM * pid[0].m/abs(kMotV2MotPWM * pid[0].m);
-  vel[1]=abs(vel_L)*kMotV2MotPWM * pid[1].m/abs(kMotV2MotPWM * pid[1].m);
-  
-  /* // Controllers
-  pid[0].update(vel[0]);
-  pid[1].update(vel[1]); 
-
-  // Actuators
-  for (i = 0; i < 2; i++) {
-    mot[i].setPWM( round( kMotV2MotPWM * vel[0]) );
-  } */
-}
-
-void Robot::stop(void) {
-  uint8_t i;
-
-  for (i = 0; i < 2; i++) {
-    setMotorPWM(i, 0);
-  }
-}
-
-void Robot::odometry(void)
-{
   float v1e = mot[0].vel * wheel_radius_right;                 //change to separate wheel radiuses for left and right
   float v2e = mot[1].vel * wheel_radius_left;     
 
@@ -105,18 +82,56 @@ void Robot::odometry(void)
   rel_theta += dtheta;
 }
 
+void Robot::stop(void) {
+  uint8_t i;
+
+  for (i = 0; i < 2; i++) {
+    setMotorPWM(i, 0);
+  }
+}
+
+/* void Robot::odometry(void)
+{
+  float v1e = mot[0].vel * wheel_radius_right;                 //change to separate wheel radiuses for left and right
+  float v2e = mot[1].vel * wheel_radius_left;     
+
+  // Estimate robot speed
+  ve = (v1e + v2e) / 2.0;
+  we = (v1e - v2e) / wheel_dist;
+  
+  // Estimate the distance and the turn angle
+  float ds = ve * dt;
+  float dtheta = we * dt;
+
+  // Estimate pose
+  xe += ds * cos(thetae + dtheta/2);
+  ye += ds * sin(thetae + dtheta/2);
+  thetae = thetae + dtheta;
+
+  // Relative displacement
+  rel_s += ds;
+  rel_theta += dtheta;
+} */
+
 void Robot::setRobotVW(float v, float w)
 {
   float v1ref = v + w * wheel_dist / 2;
   float v2ref = v - w * wheel_dist / 2; 
   
-  pid[0].w_ref = v1ref * wheel_radius_right;
-  pid[1].w_ref = v2ref * wheel_radius_left;
+  if(ve==0){
+    setMotorPWM(0,150+v1ref*1.07);
+    setMotorPWM(1,150+v2ref);
+  }else{
+
+    setMotorPWM(0,v1ref*1.07);
+    setMotorPWM(1,v2ref);
+  }
+  
 }
 
-void Robot::setMotorWref(uint8_t index, float new_w_r) {
+/* void Robot::setMotorWref(uint8_t index, float new_w_r) {
   pid[index].w_ref = new_w_r;
-}
+} */
 
 void Robot::setMotorPWM(uint8_t index, int16_t pwm) {
   mot[index].setPWM(pwm);
@@ -149,7 +164,7 @@ void Robot::initEnc() {
   pinMode(kMotEncPin1B, INPUT_PULLUP);
 }
 
-void Robot::initCtrlPID(uint8_t index) {
+/* void Robot::initCtrlPID(uint8_t index) {
 
   pid[index].kp = kMotCtrlKc;
   if (kMotCtrlTi == 0) {
@@ -168,3 +183,4 @@ void Robot::initCtrlPID(uint8_t index) {
 
   pid[index].reset();
 }
+ */

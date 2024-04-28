@@ -178,24 +178,18 @@ void loop() {
   //Serial.println(millis()-now);
   if((millis()-now)>LOOP_TIME){
     now=millis();
-    Serial.print(abs(vel_R)*robot.mot[0].pwm/abs(robot.mot[0].pwm));
+    Serial.print(robot.ve);
     Serial.print(" ");
-    Serial.print(robot.vel[1]);
+    Serial.print(robot.we);
     Serial.print(" ");
     Serial.print(robot.mot[0].pwm);
     Serial.print(" ");
-    Serial.print(kMotV2MotPWM *robot.pid[1].m);
-    
-    Serial.print(" ");
-    Serial.print(robot.pid[0].e);
-    Serial.print(" ");
-    Serial.println(robot.pid[1].e);
+    Serial.println(robot.mot[1].pwm);
     /* robot.setMotorPWM(0,100);
     robot.setMotorPWM(1,100); */
     robot.update(LOOP_TIME);
 
-    robot.setMotorWref(0,-10);
-    robot.setMotorWref(1,10);
+    robot.setRobotVW(60,0);
     //Read distance sensors if ready
     if(sensor1.isFinished()){
       robot.sonic_dist[0] = sensor1.getRange();

@@ -67,14 +67,14 @@ const unsigned long kMotCtrlLEDOkCount =
 const float kMotVmax = 7.4;          //!< maximum voltage appliable to motors (V)
 const int16_t kMotPWMmax = 255;     //!< maximum PWM (0..1023)
 const int16_t kMotPWMDeltaMax = 100;//!< maximum variation in PWM (0..1023)
-const float pwm_offset = 50;
+const float pwm_offset = 130;
 const float pulse2rad = 2*PI/19099.0249/0.01; // pulse count to rad/s constant
 const bool kMotPWMDeltaMaxEnabled = true; //!< enable limits on PWM variation
 
 const float kMotHammV0 = 0.20;         //!< estimated motors' deadzone (V)
 const float kMotHammVd = 0.12;         //!< compensated motors' deadzone (V)
 
-//! IMC tunning: desired time constant for the closed-loop (s)
+/* //! IMC tunning: desired time constant for the closed-loop (s)
 const float kMotCtrlTauCl = kMotModelTau / 1.0;
 //! IMC tunning: Kc_PI * Kp_plant
 const float kMotCtrlKcKp = kMotModelTau / (kMotCtrlTauCl + kMotModelLag);
@@ -83,7 +83,7 @@ const float kMotCtrlKc = kMotCtrlKcKp / kMotModelKp;
 //! PI integration time (s)
 const float kMotCtrlTi = kMotModelTau;
 //! Feed-Forward constant
-const float kMotCtrlKf = 0.456294584;
+const float kMotCtrlKf = 0.456294584; */
 
 /******************************************************************************
  * Conversion constants
